@@ -5,13 +5,21 @@ set -e
 PG_PASSWORD=$(jq -r '.pg_password' /data/options.json)
 PG_DATABASE=$(jq -r '.pg_database' /data/options.json)
 
-echo "[Jane DB] Starting PostgreSQL + Redis..."
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] [Jane DB] $*"; }
+
+log "Starting PostgreSQL + Redis..."
+
+# -----------------------------------------------
+# Fix permissions (HA mounts /data at runtime)
+# -----------------------------------------------
+mkdir -p /data/postgres /data/redis /run/postgresql
+chown -R postgres:postgres /data/postgres /run/postgresql
 
 # -----------------------------------------------
 # PostgreSQL initialization (first run only)
 # -----------------------------------------------
 if [ ! -f /data/postgres/PG_VERSION ]; then
-    echo "[Jane DB] First run — initializing PostgreSQL..."
+    log "First run — initializing PostgreSQL..."
     su postgres -c "initdb -D /data/postgres"
 
     su postgres -c "pg_ctl start -D /data/postgres -l /data/postgres/setup.log -w"
@@ -19,7 +27,7 @@ if [ ! -f /data/postgres/PG_VERSION ]; then
     su postgres -c "psql -c \"CREATE DATABASE ${PG_DATABASE};\""
     su postgres -c "pg_ctl stop -D /data/postgres -w"
 
-    echo "[Jane DB] PostgreSQL initialized with database '${PG_DATABASE}'"
+    log "PostgreSQL initialized with database '${PG_DATABASE}'"
 fi
 
 # -----------------------------------------------
@@ -46,7 +54,7 @@ fi
 # -----------------------------------------------
 # Start Redis (background)
 # -----------------------------------------------
-echo "[Jane DB] Starting Redis on port 6379..."
+log "Starting Redis on port 6379..."
 redis-server \
     --dir /data/redis \
     --daemonize yes \
@@ -59,5 +67,5 @@ redis-server \
 # -----------------------------------------------
 # Start PostgreSQL (foreground — keeps container alive)
 # -----------------------------------------------
-echo "[Jane DB] Starting PostgreSQL on port 5432..."
+log "Starting PostgreSQL on port 5432..."
 exec su postgres -c "postgres -D /data/postgres"
