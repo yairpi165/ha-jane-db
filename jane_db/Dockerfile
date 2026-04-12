@@ -13,6 +13,6 @@ RUN mkdir -p /data/postgres /data/redis /run/postgresql \
 
 # Copy startup script
 COPY run.sh /
-RUN chmod +x /run.sh
+RUN chmod a+x /run.sh
 
-CMD ["/run.sh"]
+CMD [ "/run.sh" ]
