@@ -1,0 +1,22 @@
+name: Jane Database
+description: PostgreSQL 16 + Redis 7 for Jane memory system
+version: 1.0.0
+slug: jane_db
+url: https://github.com/yairpi165/ha-jane-db
+arch:
+  - aarch64
+  - amd64
+ports:
+  5432/tcp: 5432
+  6379/tcp: 6379
+map:
+  - type: data
+    read_only: false
+options:
+  pg_password: "jane_secure_password"
+  pg_database: "jane"
+schema:
+  pg_password: str
+  pg_database: str
+startup: system
+boot: auto
