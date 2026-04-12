@@ -55,6 +55,14 @@ PGCONF
 fi
 
 # -----------------------------------------------
+# Apply schema (safe — uses IF NOT EXISTS)
+# -----------------------------------------------
+log "Applying schema..."
+su postgres -c "pg_ctl start -D /data/postgres -l /data/postgres/startup.log -w"
+su postgres -c "psql -d ${PG_DATABASE} -f /schema.sql" 2>&1 | while read line; do log "  $line"; done
+su postgres -c "pg_ctl stop -D /data/postgres -w"
+
+# -----------------------------------------------
 # Start Redis (background)
 # -----------------------------------------------
 log "Starting Redis on port 6379..."
