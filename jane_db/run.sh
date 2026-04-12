@@ -25,9 +25,12 @@ if [ ! -f /data/postgres/PG_VERSION ]; then
     su postgres -c "pg_ctl start -D /data/postgres -l /data/postgres/setup.log -w"
     su postgres -c "psql -c \"ALTER USER postgres PASSWORD '${PG_PASSWORD}';\""
     su postgres -c "psql -c \"CREATE DATABASE ${PG_DATABASE};\""
+    # Run schema
+    su postgres -c "psql -d ${PG_DATABASE} -f /schema.sql"
+
     su postgres -c "pg_ctl stop -D /data/postgres -w"
 
-    log "PostgreSQL initialized with database '${PG_DATABASE}'"
+    log "PostgreSQL initialized with database '${PG_DATABASE}' + schema applied"
 fi
 
 # -----------------------------------------------

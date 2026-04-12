@@ -11,8 +11,9 @@ RUN apk add --no-cache \
 RUN mkdir -p /data/postgres /data/redis /run/postgresql \
     && chown -R postgres:postgres /data/postgres /run/postgresql
 
-# Copy startup script
+# Copy startup script and schema
 COPY run.sh /
+COPY schema.sql /
 RUN chmod a+x /run.sh
 
 CMD [ "/run.sh" ]
