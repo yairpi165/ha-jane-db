@@ -70,6 +70,7 @@ redis-server \
     --dir /data/redis \
     --daemonize yes \
     --bind 0.0.0.0 \
+    --protected-mode no \
     --maxmemory 128mb \
     --maxmemory-policy allkeys-lru \
     --save 60 1000 \
