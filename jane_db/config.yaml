@@ -1,6 +1,6 @@
 name: Jane Database
 description: PostgreSQL 16 + Redis 7 for Jane memory system
-version: 1.0.7
+version: 1.0.8
 slug: jane_db
 url: https://github.com/yairpi165/ha-jane-db
 init: false
