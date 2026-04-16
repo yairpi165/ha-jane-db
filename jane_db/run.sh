@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Pin PostgreSQL 16 binaries (postgresql-pgvector installs PG 18 as default)
+export PATH="/usr/libexec/postgresql16:$PATH"
+
 # Read config from options.json
 PG_PASSWORD=$(jq -r '.pg_password' /data/options.json)
 PG_DATABASE=$(jq -r '.pg_database' /data/options.json)
