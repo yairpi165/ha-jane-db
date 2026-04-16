@@ -1,5 +1,8 @@
--- Jane Memory Schema v1.1
+-- Jane Memory Schema v1.2
 -- Run against the 'jane' database after add-on starts
+
+-- S1.6: pgvector for semantic search
+CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Memory entries: replaces the 7 MD files
 CREATE TABLE IF NOT EXISTS memory_entries (
@@ -142,3 +145,14 @@ CREATE TABLE IF NOT EXISTS response_tracking (
 );
 
 -- Seed rows removed in v1.1 — auto-migration populates from MD files
+
+-- S1.6: Embedding columns for semantic search (text-embedding-004 = 768 dims)
+ALTER TABLE episodes ADD COLUMN IF NOT EXISTS embedding vector(768);
+ALTER TABLE daily_summaries ADD COLUMN IF NOT EXISTS embedding vector(768);
+
+-- IVFFlat indexes for cosine similarity (lists tuned for ~3000 rows)
+-- Note: IVFFlat requires SET ivfflat.probes = 3 at query time for good recall
+CREATE INDEX IF NOT EXISTS idx_episodes_embedding ON episodes
+    USING ivfflat (embedding vector_cosine_ops) WITH (lists = 10);
+CREATE INDEX IF NOT EXISTS idx_daily_embedding ON daily_summaries
+    USING ivfflat (embedding vector_cosine_ops) WITH (lists = 5);
