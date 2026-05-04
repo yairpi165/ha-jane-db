@@ -1,4 +1,4 @@
--- Jane Memory Schema v1.3
+-- Jane Memory Schema v1.4
 -- Run against the 'jane' database after add-on starts
 
 -- S1.6: pgvector for semantic search
@@ -194,3 +194,11 @@ CREATE TABLE IF NOT EXISTS user_overrides (
     ts TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_user_overrides_ts ON user_overrides(ts DESC);
+
+-- S3.2 (JANE-45, D5): correlate dismissals with the proactive_decision row
+-- they overrode, instead of relying on a 5-minute time-window heuristic.
+-- ON DELETE SET NULL so override rows survive event archival.
+ALTER TABLE user_overrides ADD COLUMN IF NOT EXISTS proactive_decision_id
+    INT REFERENCES events(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_user_overrides_proactive_decision
+    ON user_overrides(proactive_decision_id) WHERE proactive_decision_id IS NOT NULL;
